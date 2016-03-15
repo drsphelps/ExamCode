@@ -6,6 +6,9 @@
 #Version Number 1.0
 
 import random
+import pickle
+
+score = 0
 
 def GetRowColumn():
   print()
@@ -123,17 +126,55 @@ def GetMainMenuChoice():
   print()
   return Choice
 
+def HighScores():
+  highscores_file = open("highscores.txt", "rb")
+  highscores = pickle.load(highscores_file)
+  highscores_file.close()
+      
+  name = input("What's your name? ")
+  highscores[name] = score
+      
+  highscores_file = open("highscores.txt", "wb")
+  pickle.dump(highscores, highscores_file)
+  highscores_array = []
+      
+  for i in highscores:
+    highscores_array.append(i)
+  
+  print("---HIGHSCORES---")      
+  highscores_array = sorted(highscores_array, reversed = True) 
+  for i in highscores:
+    for j in highscores_array:
+      if i == j:
+        print("{1}:{0}".format(i, highscores[i]))
+        
+  score = 0
+  print()
+  
 def PlayGame(Board, Ships):
+  global score
   GameWon = False
   while not GameWon:
     PrintBoard(Board)
     MakePlayerMove(Board, Ships)
+    score += 1
+    if score >= 45:
+      print("Too many moves! You have lost.")
+      GameWon = True
     GameWon = CheckWin(Board)
     if GameWon:
-      print("All ships sunk!")
-      print()
+      if score < 45:
+        print("All ships sunk!")
+      HighScores()
+
 
 if __name__ == "__main__":
+  """
+  highscores_file = open("highscores.txt","wb")
+  scores = {"test":46,}
+  pickle.dump(scores, highscores_file)
+  highscores_file.close()
+  """
   TRAININGGAME = "Training.txt"
   MenuOption = 0
   while not MenuOption == 9:
